@@ -972,15 +972,27 @@
       Cadastre seu e-mail e seja o primeiro a saber quando lançarmos.
     </p>
 
-    <form class="notify-form reveal" onsubmit="handleNotify(event)">
+    <form
+      class="notify-form reveal"
+      action="https://nosapp.us19.list-manage.com/subscribe/post?u=4363edab0f569a80ec5aea3bd&amp;id=c63b843b9e&amp;f_id=00a7b5e0f0"
+      method="post"
+      target="_blank"
+      novalidate
+      onsubmit="handleNotify(event)"
+    >
       <input
         type="email"
+        name="EMAIL"
         class="notify-input"
         placeholder="seu@email.com.br"
         required
         id="emailInput"
       />
-      <button type="submit" class="notify-submit">Me avise no lançamento</button>
+      <!-- campo anti-bot obrigatório pelo Mailchimp — não remover -->
+      <div style="position:absolute; left:-5000px;" aria-hidden="true">
+        <input type="text" name="b_4363edab0f569a80ec5aea3bd_c63b843b9e" tabindex="-1" value="" />
+      </div>
+      <button type="submit" name="subscribe" class="notify-submit">Me avise no lançamento</button>
     </form>
 
     <div class="store-badges reveal">
