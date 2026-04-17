@@ -972,28 +972,15 @@
       Cadastre seu e-mail e seja o primeiro a saber quando lançarmos.
     </p>
 
-    <form
-      class="notify-form reveal"
-      action="https://nosapp.us19.list-manage.com/subscribe/post?u=4363edab0f569a80ec5aea3bd&amp;id=c63b843b9e&amp;f_id=00a7b5e0f0"
-      method="post"
-      target="_blank"
-      novalidate
-      onsubmit="handleNotify(event)"
-    >
+    <div class="notify-form reveal">
       <input
         type="email"
-        name="EMAIL"
         class="notify-input"
         placeholder="seu@email.com.br"
-        required
         id="emailInput"
       />
-      <!-- campo anti-bot obrigatório pelo Mailchimp — não remover -->
-      <div style="position:absolute; left:-5000px;" aria-hidden="true">
-        <input type="text" name="b_4363edab0f569a80ec5aea3bd_c63b843b9e" tabindex="-1" value="" />
-      </div>
-      <button type="submit" name="subscribe" class="notify-submit">Me avise no lançamento</button>
-    </form>
+      <button class="notify-submit" id="notifyBtn" onclick="handleNotify()">Me avise no lançamento</button>
+    </div>
 
     <div class="store-badges reveal">
       <div class="store-badge">
@@ -1038,15 +1025,54 @@
     }, { threshold: 0.12 });
     reveals.forEach(el => observer.observe(el));
 
-    // Notify form
-    function handleNotify(e) {
-      e.preventDefault();
-      const btn = e.target.querySelector('button');
+    // Notify form — envia ao Mailchimp via JSONP (sem recarregar a página)
+    function handleNotify() {
       const input = document.getElementById('emailInput');
-      btn.textContent = '✓ Cadastrado! Obrigado';
-      btn.style.background = '#2D7A4F';
-      input.disabled = true;
+      const btn = document.getElementById('notifyBtn');
+      const email = input.value.trim();
+
+      // Validação básica
+      if (!email || !email.includes('@')) {
+        input.style.borderColor = '#C0392B';
+        input.focus();
+        return;
+      }
+
+      // Feedback imediato: desabilita campos enquanto envia
+      btn.textContent = 'Enviando...';
       btn.disabled = true;
+      input.disabled = true;
+
+      // Monta a URL no formato JSONP que o Mailchimp aceita
+      const baseUrl = 'https://nosapp.us19.list-manage.com/subscribe/post-json';
+      const params = new URLSearchParams({
+        u: '4363edab0f569a80ec5aea3bd',
+        id: 'c63b843b9e',
+        f_id: '00a7b5e0f0',
+        EMAIL: email,
+        c: 'mailchimpCallback'
+      });
+
+      // Cria o callback JSONP
+      window.mailchimpCallback = function(data) {
+        document.getElementById('mc-script').remove();
+        if (data.result === 'success' || data.msg.includes('already subscribed')) {
+          btn.textContent = '✓ Cadastrado! Obrigado';
+          btn.style.background = '#2D7A4F';
+        } else {
+          btn.textContent = 'Tente novamente';
+          btn.style.background = '#C0392B';
+          btn.disabled = false;
+          input.disabled = false;
+          input.style.borderColor = '#C0392B';
+        }
+      };
+
+      // Injeta o script JSONP
+      const script = document.createElement('script');
+      script.id = 'mc-script';
+      script.src = baseUrl + '?' + params.toString();
+      document.body.appendChild(script);
     }
   </script>
 </body>
